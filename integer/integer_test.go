@@ -33,6 +33,8 @@ func TestGetTypeSize(t *testing.T) {
 	assert.Equal(t, GetSizeUnsafe(varT[uint64]()), 8)
 	assert.Equal(t, GetSizeUnsafe(varT[float32]()), 4)
 	assert.Equal(t, GetSizeUnsafe(varT[float64]()), 8)
+
+	assert.NotEqual(t, GetSize(""), 0)
 }
 
 func TestIntTransfer(t *testing.T) {
