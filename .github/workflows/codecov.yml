@@ -21,7 +21,10 @@ jobs:
       with:
         go-version: 1.19
     - name: Run Go test coverage
-      run: find . -name go.mod -execdir go mod tidy && go mod vendor && go test -v ./... -race -coverprofile=coverage.txt -covermode=atomic \;
+      run: |
+        find . -name go.mod \
+          -execdir go mod vendor \; \
+          -execdir go test -v ./... -race -coverprofile=coverage.txt -covermode=atomic \;
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
