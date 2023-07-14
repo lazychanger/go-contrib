@@ -13,8 +13,12 @@ func RegisterDefaultLogger(logger Logger) {
 
 func GetLogger() Logger {
 	if globalLogger == nil {
+		f, _ := os.Open(os.DevNull)
+		if f == nil {
+			f = os.Stdout
+		}
 		globalLogger = &emptyLogger{
-			Writer: os.DevNull,
+			Writer: f,
 		}
 	}
 
