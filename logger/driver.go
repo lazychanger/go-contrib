@@ -25,8 +25,6 @@ func GetLogger() Logger {
 	return globalLogger
 }
 
-type TestLogger = emptyLogger
-
 type emptyLogger struct {
 	io.Writer
 	lvl Level

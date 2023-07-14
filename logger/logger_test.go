@@ -35,4 +35,5 @@ func TestLogger(t *testing.T) {
 
 	log.Info(msg)
 
+	assert.Equal(t, buf.String(), msg)
 }
