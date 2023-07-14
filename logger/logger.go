@@ -1,9 +1,13 @@
 package logger
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 // Logger is an interface that defines the logging functionality of a program.
 type Logger interface {
+	io.Writer
 
 	// With returns a new Logger with the specified field added to the context.
 	With(name string, value any) Logger
@@ -20,11 +24,17 @@ type Logger interface {
 	// Level returns the current level of the logger.
 	Level() Level
 
+	// Format returns the current format of the logger.
+	Format() Format
+
 	// SetLevel sets the current level of the logger.
 	SetLevel(lvl Level)
 
 	// SetFormat sets the format of the logger.
 	SetFormat(format Format)
+
+	// SetWriter sets the log output
+	SetWriter(writer io.Writer)
 
 	// Log logs a message at the specified level.
 	Log(lvl Level, msg string)

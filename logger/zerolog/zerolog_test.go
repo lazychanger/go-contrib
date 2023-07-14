@@ -3,7 +3,7 @@ package zerolog
 import (
 	"bytes"
 	"fmt"
-	"github.com/lazychanger/go-contrib/logger"
+	loggerPkg "github.com/lazychanger/go-contrib/logger"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"testing"
@@ -73,7 +73,7 @@ func TestLogger(t *testing.T) {
 func BenchmarkLogger(b *testing.B) {
 	nlog := New(log.Logger)
 	b.Run("logger", func(b *testing.B) {
-		nlog.SetLevel(logger.ErrorLevel)
+		nlog.SetLevel(loggerPkg.ErrorLevel)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			nlog.Info(fmt.Sprintf("%d", i))

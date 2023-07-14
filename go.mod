@@ -3,6 +3,7 @@ module github.com/lazychanger/go-contrib
 go 1.20
 
 require (
+	github.com/cloudwego/hertz v0.6.6
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.4
 	github.com/thanhpk/randstr v1.0.6

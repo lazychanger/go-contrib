@@ -1,5 +1,10 @@
 package logger
 
+import (
+	"io"
+	"os"
+)
+
 var globalLogger Logger
 
 func RegisterDefaultLogger(logger Logger) {
@@ -8,13 +13,20 @@ func RegisterDefaultLogger(logger Logger) {
 
 func GetLogger() Logger {
 	if globalLogger == nil {
-		globalLogger = &emptyLogger{}
+		globalLogger = &emptyLogger{
+			Writer: os.DevNull,
+		}
 	}
 
 	return globalLogger
 }
 
+type TestLogger = emptyLogger
+
 type emptyLogger struct {
+	io.Writer
+	lvl Level
+	fmt Format
 }
 
 func (e *emptyLogger) With(_ string, _ any) Logger {
@@ -25,16 +37,26 @@ func (e *emptyLogger) Withs(_ ...Field) Logger {
 	return e
 }
 
-func (e *emptyLogger) WithLevel(_ Level) Logger {
+func (e *emptyLogger) WithLevel(lvl Level) Logger {
+	e.lvl = lvl
 	return e
 }
 
-func (e *emptyLogger) WithFormat(_ Format) Logger {
+func (e *emptyLogger) WithFormat(fmt Format) Logger {
+	e.fmt = fmt
 	return e
 }
 
 func (e *emptyLogger) Level() Level {
-	return NoLevel
+	return e.lvl
+}
+
+func (e *emptyLogger) Format() Format {
+	return e.fmt
+}
+
+func (e *emptyLogger) SetWriter(writer io.Writer) {
+	e.Writer = writer
 }
 
 func (e *emptyLogger) SetLevel(_ Level) {

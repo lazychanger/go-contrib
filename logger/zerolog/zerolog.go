@@ -1,34 +1,40 @@
 package zerolog
 
 import (
-	"github.com/lazychanger/go-contrib/logger"
+	loggerPkg "github.com/lazychanger/go-contrib/logger"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"io"
 	"os"
 )
 
 func init() {
-	logger.RegisterDefaultLogger(New(log.Logger))
+	loggerPkg.RegisterDefaultLogger(New(log.Logger))
 }
 
-type Logger struct {
+type logger struct {
 	zlog *zerolog.Logger
-	lvl  logger.Level
+	lvl  loggerPkg.Level
+	fmt  loggerPkg.Format
 }
 
-func (l *Logger) Log(lvl logger.Level, msg string) {
+func (l *logger) Write(p []byte) (n int, err error) {
+	return l.zlog.Write(p)
+}
+
+func (l *logger) Log(lvl loggerPkg.Level, msg string) {
 	l.LogF(lvl, msg)
 }
 
-func (l *Logger) LogF(lvl logger.Level, msg string, a ...any) {
+func (l *logger) LogF(lvl loggerPkg.Level, msg string, a ...any) {
 	l.zlog.WithLevel(ParseLevel(lvl)).Msgf(msg, a...)
 }
 
-func (l *Logger) With(name string, value any) logger.Logger {
-	return l.Withs(logger.Field{Name: name, Value: value})
+func (l *logger) With(name string, value any) loggerPkg.Logger {
+	return l.Withs(loggerPkg.Field{Name: name, Value: value})
 }
 
-func (l *Logger) Withs(fields ...logger.Field) logger.Logger {
+func (l *logger) Withs(fields ...loggerPkg.Field) loggerPkg.Logger {
 	fs := map[string]interface{}{}
 	for _, field := range fields {
 		fs[field.Name] = field.Value
@@ -37,35 +43,43 @@ func (l *Logger) Withs(fields ...logger.Field) logger.Logger {
 	return New(l.zlog.With().Fields(fs).Logger())
 }
 
-func (l *Logger) WithLevel(lvl logger.Level) logger.Logger {
+func (l *logger) WithLevel(lvl loggerPkg.Level) loggerPkg.Logger {
 	return New(l.zlog.Level(ParseLevel(lvl)))
 }
-func (l *Logger) WithFormat(format logger.Format) logger.Logger {
+func (l *logger) WithFormat(format loggerPkg.Format) loggerPkg.Logger {
 	newlogger := New(*l.zlog)
 	newlogger.SetFormat(format)
 	return newlogger
 }
 
-func (l *Logger) Level() logger.Level {
-	l.zlog.Info()
+func (l *logger) Level() loggerPkg.Level {
 	return l.lvl
 }
 
-func (l *Logger) SetLevel(lvl logger.Level) {
+func (l *logger) Format() loggerPkg.Format {
+	return l.fmt
+}
+
+func (l *logger) SetWriter(writer io.Writer) {
+	output := l.zlog.Output(writer)
+	l.zlog = &output
+}
+
+func (l *logger) SetLevel(lvl loggerPkg.Level) {
 	l.lvl = lvl
 	newzlog := l.zlog.Level(ParseLevel(lvl))
 	l.zlog = &newzlog
 }
 
-func (l *Logger) SetFormat(format logger.Format) {
+func (l *logger) SetFormat(format loggerPkg.Format) {
 	var newzlog = *l.zlog
 	switch format {
-	case logger.Text:
+	case loggerPkg.Text:
 		newzlog = l.zlog.Output(zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
 			w.NoColor = true
 		}))
 		break
-	case logger.Json:
+	case loggerPkg.Json:
 		newzlog = l.zlog.Output(os.Stderr)
 		break
 	default:
@@ -74,72 +88,73 @@ func (l *Logger) SetFormat(format logger.Format) {
 	}
 
 	l.zlog = &newzlog
+	l.fmt = format
 }
 
-func (l *Logger) Trace(msg string) {
-	l.LogF(logger.TraceLevel, msg)
+func (l *logger) Trace(msg string) {
+	l.LogF(loggerPkg.TraceLevel, msg)
 }
 
-func (l *Logger) Debug(msg string) {
-	l.LogF(logger.DebugLevel, msg)
+func (l *logger) Debug(msg string) {
+	l.LogF(loggerPkg.DebugLevel, msg)
 }
 
-func (l *Logger) Info(msg string) {
-	l.LogF(logger.InfoLevel, msg)
+func (l *logger) Info(msg string) {
+	l.LogF(loggerPkg.InfoLevel, msg)
 }
 
-func (l *Logger) Warn(msg string) {
-	l.LogF(logger.WarnLevel, msg)
+func (l *logger) Warn(msg string) {
+	l.LogF(loggerPkg.WarnLevel, msg)
 }
 
-func (l *Logger) Error(msg string) {
-	l.LogF(logger.ErrorLevel, msg)
+func (l *logger) Error(msg string) {
+	l.LogF(loggerPkg.ErrorLevel, msg)
 }
 
-func (l *Logger) Fatal(msg string) {
-	l.LogF(logger.FatalLevel, msg)
+func (l *logger) Fatal(msg string) {
+	l.LogF(loggerPkg.FatalLevel, msg)
 }
 
-func (l *Logger) Panic(msg string) {
-	l.LogF(logger.PanicLevel, msg)
+func (l *logger) Panic(msg string) {
+	l.LogF(loggerPkg.PanicLevel, msg)
 }
 
-func (l *Logger) TraceF(msg string, a ...any) {
-	l.LogF(logger.TraceLevel, msg, a...)
+func (l *logger) TraceF(msg string, a ...any) {
+	l.LogF(loggerPkg.TraceLevel, msg, a...)
 }
 
-func (l *Logger) DebugF(msg string, a ...any) {
-	l.LogF(logger.DebugLevel, msg, a...)
+func (l *logger) DebugF(msg string, a ...any) {
+	l.LogF(loggerPkg.DebugLevel, msg, a...)
 }
 
-func (l *Logger) InfoF(msg string, a ...any) {
-	l.LogF(logger.InfoLevel, msg, a...)
+func (l *logger) InfoF(msg string, a ...any) {
+	l.LogF(loggerPkg.InfoLevel, msg, a...)
 }
 
-func (l *Logger) WarnF(msg string, a ...any) {
-	l.LogF(logger.WarnLevel, msg, a...)
+func (l *logger) WarnF(msg string, a ...any) {
+	l.LogF(loggerPkg.WarnLevel, msg, a...)
 }
 
-func (l *Logger) ErrorF(msg string, a ...any) {
-	l.LogF(logger.ErrorLevel, msg, a...)
+func (l *logger) ErrorF(msg string, a ...any) {
+	l.LogF(loggerPkg.ErrorLevel, msg, a...)
 }
 
-func (l *Logger) FatalF(msg string, a ...any) {
-	l.LogF(logger.FatalLevel, msg, a...)
+func (l *logger) FatalF(msg string, a ...any) {
+	l.LogF(loggerPkg.FatalLevel, msg, a...)
 }
 
-func (l *Logger) PanicF(msg string, a ...any) {
-	l.LogF(logger.PanicLevel, msg, a...)
+func (l *logger) PanicF(msg string, a ...any) {
+	l.LogF(loggerPkg.PanicLevel, msg, a...)
 }
 
-func (l *Logger) Register() {
-	logger.RegisterDefaultLogger(l)
+func New(zlog zerolog.Logger) loggerPkg.Logger {
+	return &logger{
+		zlog: &zlog,
+		lvl:  loggerPkg.Level(zlog.GetLevel()),
+		fmt:  loggerPkg.Color,
+	}
 }
 
-func New(zlog zerolog.Logger) *Logger {
-	return &Logger{&zlog, logger.Level(zlog.GetLevel())}
-}
-
-func ParseLevel(lvl logger.Level) zerolog.Level {
+func ParseLevel(lvl loggerPkg.Level) zerolog.Level {
 	return zerolog.Level(lvl)
 }

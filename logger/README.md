@@ -38,6 +38,7 @@ func main() {
 ## Todo
 
 ** More driver **
-- [x] zerolog
+- [x] [zerolog](https://github.com/rs/zerolog)
+- [x] [cloudwego/hlog](github.com/cloudwego/hertz/pkg/common/hlog)
 - [ ] zap
 - [ ] logrus
