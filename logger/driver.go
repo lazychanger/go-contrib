@@ -61,10 +61,12 @@ func (e *emptyLogger) SetWriter(writer io.Writer) {
 	e.Writer = writer
 }
 
-func (e *emptyLogger) SetLevel(_ Level) {
+func (e *emptyLogger) SetLevel(lvl Level) {
+	e.lvl = lvl
 }
 
-func (e *emptyLogger) SetFormat(_ Format) {
+func (e *emptyLogger) SetFormat(format Format) {
+	e.fmt = format
 }
 
 func (e *emptyLogger) Log(_ Level, _ string) {
